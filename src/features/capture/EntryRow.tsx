@@ -103,7 +103,16 @@ export function EntryRow({ entry, people, speaker, elapsed, agendaTitle }: Entry
           </div>
 
           {entry.kind === 'action' ? (
-            <div className="row__pair">
+            <>
+              <button
+                type="button"
+                className={`row__done${entry.done ? ' row__done--on' : ''}`}
+                aria-pressed={entry.done}
+                onClick={() => updateEntry(entry.id, { done: !entry.done })}
+              >
+                {entry.done ? '끝냈어요' : '아직 안 했어요'}
+              </button>
+              <div className="row__pair">
               <label className="row__field">
                 <span className="row__label">담당</span>
                 <input
@@ -122,7 +131,8 @@ export function EntryRow({ entry, people, speaker, elapsed, agendaTitle }: Entry
                   onChange={(event) => updateEntry(entry.id, { due: event.target.value || null })}
                 />
               </label>
-            </div>
+              </div>
+            </>
           ) : null}
 
           {entry.kind === 'decision' ? (

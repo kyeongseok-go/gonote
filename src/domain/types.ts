@@ -186,4 +186,9 @@ export interface Settings {
   defaultScribe: string
   /** 카톡용 텍스트에 발언까지 넣을까. 기본은 결정·할 일만 — 그게 읽힌다 */
   shareIncludesSpeech: boolean
+  /**
+   * 공유 글에서 발언자 이름을 직분으로 바꿀까.
+   * 회의록 원본(인쇄·PDF)은 늘 실명이다 — 이 스위치는 **공유 글에만** 걸린다.
+   */
+  shareHidesNames: boolean
 }

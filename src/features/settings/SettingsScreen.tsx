@@ -70,6 +70,21 @@ export function SettingsScreen() {
           </span>
           <span className="set__pill">{settings.shareIncludesSpeech ? '켜짐' : '꺼짐'}</span>
         </button>
+        <button
+          type="button"
+          className={`set__toggle${settings.shareHidesNames ? ' set__toggle--on' : ''}`}
+          aria-pressed={settings.shareHidesNames}
+          onClick={() => updateSettings({ shareHidesNames: !settings.shareHidesNames })}
+        >
+          <span>
+            <span className="set__tlabel">공유할 때 발언자 이름 가리기</span>
+            <span className="set__thint">
+              카톡으로 넓게 돌릴 때 켜요. 이름이 직분으로 바뀌어요(김영수 장로 → 장로). 인쇄하는 회의록
+              원본은 늘 실명이에요.
+            </span>
+          </span>
+          <span className="set__pill">{settings.shareHidesNames ? '가림' : '실명'}</span>
+        </button>
         <p className="set__hint">
           <strong>메모</strong>로 적은 줄은 어떤 경우에도 회의록·공유 글에 나가지 않아요.
         </p>

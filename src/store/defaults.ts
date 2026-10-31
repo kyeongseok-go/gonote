@@ -9,6 +9,8 @@ export function defaultSettings(): Settings {
     defaultScribe: '',
     // 기본은 결정·할 일만. 발언까지 넣으면 카톡에서 길어서 아무도 안 읽는다.
     shareIncludesSpeech: false,
+    // 기본은 실명. 회의록은 누가 말했는지가 기록의 일부다. 넓게 돌릴 때만 켠다.
+    shareHidesNames: false,
   }
 }
 

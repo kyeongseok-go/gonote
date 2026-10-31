@@ -193,3 +193,50 @@ describe('fileNameOf', () => {
     expect(fileNameOf(makeMeeting({ title: '  ' }))).toBe('2026-11-01_회의록')
   })
 })
+
+describe('shareText — 발언자 익명화 (공개본)', () => {
+  test('익명화를 켜면 발언자가 직분으로 바뀐다', () => {
+    const text = shareText(doc(AGENDAS, ENTRIES), { includeSpeech: true, hideNames: true })
+
+    // 발언 줄에서 이름이 사라진다. (할 일의 담당자는 일부러 남긴다 — 아래 테스트)
+    expect(text).toContain('장로: 작년보다 인원이 늘 것 같아요')
+    expect(text).not.toContain('김영수 장로: ')
+  })
+
+  test('직분이 없으면 참석자로 적는다', () => {
+    const text = shareText(
+      buildMinutes({
+        meeting: makeMeeting(),
+        people: { p9: makePerson({ id: 'p9', name: '무직분', role: '' }) },
+        agendas: byId(AGENDAS),
+        entries: byId([makeEntry({ id: 'e1', agendaId: 'a1', kind: 'speech', speakerId: 'p9', text: '말했다' })]),
+      }),
+      { includeSpeech: true, hideNames: true },
+    )
+
+    expect(text).toContain('참석자: 말했다')
+  })
+
+  test('할 일의 담당자는 익명화하지 않는다 — 누가 맡았는지 모르면 할 일이 아니다', () => {
+    const text = shareText(doc(AGENDAS, ENTRIES), { includeSpeech: true, hideNames: true })
+
+    expect(text).toContain('김영수 장로')
+  })
+
+  test('익명화를 끄면 이름이 그대로 나간다', () => {
+    const text = shareText(doc(AGENDAS, ENTRIES), { includeSpeech: true, hideNames: false })
+
+    expect(text).toContain('김영수 장로: 작년보다 인원이 늘 것 같아요')
+  })
+})
+
+describe('shareText — 끝낸 할 일', () => {
+  test('완료한 할 일에 표시가 붙는다', () => {
+    const text = shareText(
+      doc(AGENDAS, [makeEntry({ id: 'e1', kind: 'action', text: '현수막 주문', done: true })]),
+      { includeSpeech: false },
+    )
+
+    expect(text).toContain('현수막 주문 (완료)')
+  })
+})

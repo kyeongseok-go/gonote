@@ -18,6 +18,7 @@ import { ENTRY_HINTS, ENTRY_KINDS, ENTRY_LABELS } from '../../domain/types'
 import type { EntryKind } from '../../domain/types'
 import { EntryRow } from './EntryRow'
 import { AgendaBar } from './AgendaBar'
+import { TemplatePick } from './TemplatePick'
 import { SpeakerBar } from './SpeakerBar'
 import './capture.css'
 
@@ -99,13 +100,13 @@ export function CaptureScreen() {
         <Link to="/" className="cap__back" aria-label="회의 목록으로">
           <ChevronLeft size={22} aria-hidden="true" />
         </Link>
-        <div className="cap__title">
+        <Link to={`/m/${meeting.id}/info`} className="cap__title">
           <h1>{meeting.title}</h1>
           <p className="cap__meta">
             {meeting.openedAt ? `${clockOf(meeting.openedAt)} 개회` : '개회 전'} · 적은 줄 {entries.length}개
-            {doc.decisions.length > 0 ? ` · 결정 ${doc.decisions.length}건` : ''}
+            {doc.attendance.total > 0 ? ` · 참석 ${doc.attendance.presentCount}명` : ' · 참석자 넣기'}
           </p>
-        </div>
+        </Link>
         <Link to={`/m/${meeting.id}/doc`} className="cap__doc">
           <FileText size={18} aria-hidden="true" />
           회의록
@@ -132,6 +133,7 @@ export function CaptureScreen() {
       <AgendaBar meetingId={meeting.id} agendas={agendas} currentId={currentAgendaId} onPick={setAgendaId} />
 
       <section className="cap__list" aria-label="적은 기록">
+        {entries.length === 0 && agendas.length === 0 ? <TemplatePick meetingId={meeting.id} /> : null}
         {entries.length === 0 ? (
           <div className="cap__empty">
             <p className="cap__empty-title">아직 적은 것이 없어요</p>

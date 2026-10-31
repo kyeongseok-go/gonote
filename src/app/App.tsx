@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import { useApp } from '../store/app'
 import { MeetingList } from '../features/meetings/MeetingList'
+import { MeetingInfo } from '../features/meetings/MeetingInfo'
 import { CaptureScreen } from '../features/capture/CaptureScreen'
 import { MinutesScreen } from '../features/minutes/MinutesScreen'
 import { PeopleScreen } from '../features/people/PeopleScreen'
@@ -59,6 +60,7 @@ function Shell() {
       <Routes>
         <Route path="/" element={<MeetingList />} />
         <Route path="/m/:id" element={<CaptureScreen />} />
+        <Route path="/m/:id/info" element={<MeetingInfo />} />
         <Route path="/m/:id/doc" element={<MinutesScreen />} />
         <Route path="/people" element={<PeopleScreen />} />
         <Route path="/settings" element={<SettingsScreen />} />

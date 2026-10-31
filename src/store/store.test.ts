@@ -324,3 +324,109 @@ describe('clearEverything', () => {
     expect(await db.entries.count()).toBe(0)
   })
 })
+
+describe('회의 틀', () => {
+  test('틀을 고르면 안건이 순서대로 깔린다 — 회의 전 안건이 회의록의 뼈대가 된다', async () => {
+    const meeting = state().createMeeting({ templateId: 'board' })
+    await state().settled()
+
+    const agendas = Object.values(state().entities.agendas)
+      .filter((row) => row.meetingId === meeting.id)
+      .sort((a, b) => a.order - b.order)
+    expect(agendas[0].title).toBe('개회 (기도·찬송)')
+    expect(agendas.at(-1)?.title).toBe('폐회 (기도)')
+    expect(agendas.map((row) => row.order)).toEqual([0, 1, 2, 3, 4, 5])
+  })
+
+  test('틀의 회의 종류가 회의 머리말에 들어간다', () => {
+    const meeting = state().createMeeting({ templateId: 'board' })
+
+    expect(meeting.kind).toBe('제직회')
+    expect(meeting.title).toBe('11월 제직회')
+  })
+
+  test('사람이 지은 제목은 틀이 덮지 않는다', () => {
+    const meeting = state().createMeeting({ templateId: 'board', title: '임시 회의' })
+
+    expect(meeting.title).toBe('임시 회의')
+  })
+
+  test('빈 회의 틀은 안건을 만들지 않는다', () => {
+    const meeting = state().createMeeting({ templateId: 'plain' })
+
+    expect(Object.values(state().entities.agendas).filter((row) => row.meetingId === meeting.id)).toEqual([])
+  })
+
+  test('없는 틀을 주면 그냥 빈 회의가 된다', () => {
+    const meeting = state().createMeeting({ templateId: '없는틀' })
+
+    expect(meeting).toBeDefined()
+    expect(Object.values(state().entities.agendas)).toEqual([])
+  })
+
+  test('참석자를 주면 전원 참석으로 올라간다', () => {
+    const one = state().addPerson('김영수')!
+    const two = state().addPerson('박미경')!
+
+    const meeting = state().createMeeting({ attendeeIds: [one.id, two.id] })
+
+    expect(meeting.attendees).toEqual([
+      { personId: one.id, attendance: 'present' },
+      { personId: two.id, attendance: 'present' },
+    ])
+  })
+
+  test('나중에 틀을 적용하면 이미 있는 안건 뒤에 붙는다', async () => {
+    const meeting = state().createMeeting()
+    state().addAgenda(meeting.id, '먼저 만든 안건')
+
+    state().applyTemplate(meeting.id, 'dept')
+    await state().settled()
+
+    const agendas = Object.values(state().entities.agendas)
+      .filter((row) => row.meetingId === meeting.id)
+      .sort((a, b) => a.order - b.order)
+    expect(agendas[0].title).toBe('먼저 만든 안건')
+    expect(agendas[1].title).toBe('지난 할 일 확인')
+  })
+
+  test('틀을 적용해도 사람이 적은 회의 종류는 건드리지 않는다', () => {
+    const meeting = state().createMeeting()
+    state().updateMeeting(meeting.id, { kind: '임시 모임' })
+
+    state().applyTemplate(meeting.id, 'board')
+
+    expect(state().entities.meetings[meeting.id].kind).toBe('임시 모임')
+  })
+})
+
+describe('@이름으로 담당자 지정', () => {
+  test('할 일에 @이름을 적으면 담당자가 붙고 글에서 떼어 낸다', () => {
+    const person = state().addPerson('김영수', '장로')!
+    const meeting = state().createMeeting()
+
+    const entry = state().addEntry({ meetingId: meeting.id, kind: 'action', text: '현수막 주문 @김영수' })!
+
+    expect(entry.assigneeId).toBe(person.id)
+    expect(entry.text).toBe('현수막 주문')
+  })
+
+  test('발언에서는 @이름을 담당으로 읽지 않는다 — "@김영수 말대로" 가 지정이 되면 안 된다', () => {
+    state().addPerson('김영수')
+    const meeting = state().createMeeting()
+
+    const entry = state().addEntry({ meetingId: meeting.id, kind: 'speech', text: '@김영수 말대로 하죠' })!
+
+    expect(entry.assigneeId).toBeNull()
+    expect(entry.text).toBe('@김영수 말대로 하죠')
+  })
+
+  test('명부에 없는 이름은 글에 남는다', () => {
+    const meeting = state().createMeeting()
+
+    const entry = state().addEntry({ meetingId: meeting.id, kind: 'action', text: '연락 @사장님' })!
+
+    expect(entry.assigneeId).toBeNull()
+    expect(entry.text).toBe('연락 @사장님')
+  })
+})

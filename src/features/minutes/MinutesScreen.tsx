@@ -67,7 +67,10 @@ export function MinutesScreen() {
     }
   }
 
-  const full = shareText(doc, { includeSpeech: settings.shareIncludesSpeech })
+  const full = shareText(doc, {
+    includeSpeech: settings.shareIncludesSpeech,
+    hideNames: settings.shareHidesNames,
+  })
   const short = summaryText(doc)
 
   const share = async () => {
@@ -211,7 +214,10 @@ export function MinutesScreen() {
               <tbody>
                 {doc.actions.map((row) => (
                   <tr key={row.id}>
-                    <td>{row.text}</td>
+                    <td>
+                      {row.text}
+                      {row.done ? <span className="paper__done">완료</span> : null}
+                    </td>
                     <td>{row.assigneeText.trim() || nameOf(entities.people, row.assigneeId) || '—'}</td>
                     <td className="tnum">{row.due ?? '—'}</td>
                   </tr>

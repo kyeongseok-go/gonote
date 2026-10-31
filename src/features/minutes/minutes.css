@@ -227,6 +227,16 @@
   vertical-align: top;
 }
 
+.paper__done {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklab, var(--ok) 14%, transparent);
+  color: var(--decision-ink);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+}
+
 .paper__actions th {
   color: var(--muted);
   font-size: var(--text-2xs);
@@ -430,7 +440,17 @@
   .paper__kind,
   .paper__facts dt,
   .paper__people dt,
-  .paper__actions th {
+  .paper__done {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklab, var(--ok) 14%, transparent);
+  color: var(--decision-ink);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+}
+
+.paper__actions th {
     color: #444444;
   }
 

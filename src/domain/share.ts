@@ -17,6 +17,17 @@ import type { Entry, Meeting } from './types'
 export interface ShareOptions {
   /** 안건별 발언 기록까지 넣을까. 끄면 결정·할 일만 남는다 */
   includeSpeech: boolean
+  /**
+   * 발언자 이름을 직분으로 바꿀까.
+   *
+   * **원본과 공개본을 나누는 장치다.** 회의록 원본(인쇄·PDF)은 누가 말했는지 실명으로
+   * 남겨야 기록으로서 의미가 있지만(공동주택관리법 시행령 18조는 반대 의견자의 성명 기재를
+   * 요구한다), 카톡방처럼 더 넓게 돌아가는 자리에서는 개인정보보호위원회가 열람 시
+   * 익명·가명처리를 권한다. 법제처는 회의록의 발언 내용 자체를 개인정보로 본다.
+   * 그 둘을 한 문서로 만족시킬 수 없어서 **공유 글에만** 이 스위치를 뒀다.
+   * (research/refs-church.md)
+   */
+  hideNames?: boolean
 }
 
 /**
@@ -50,10 +61,14 @@ function placeLine(doc: MinutesDoc): string {
   return parts.filter((part) => part.length > 0).join(' · ')
 }
 
+/** 할 일 한 줄. **담당자 이름은 익명화하지 않는다** — 누가 맡았는지 모르면 할 일이 아니다. */
 function actionLine(doc: MinutesDoc, action: Entry): string {
-  const who = action.assigneeText.trim() || nameOf(doc.people, action.assigneeId)
-  const tail = [who, action.due ? `${shortDue(action.due)}까지` : ''].filter((part) => part.length > 0).join(' · ')
-  return tail ? `· ${action.text} — ${tail}` : `· ${action.text}`
+  const owner = action.assigneeText.trim() || nameOf(doc.people, action.assigneeId)
+  const tail = [owner, action.due ? `${shortDue(action.due)}까지` : '']
+    .filter((part) => part.length > 0)
+    .join(' · ')
+  const mark = action.done ? ' (완료)' : ''
+  return tail ? `· ${action.text}${mark} — ${tail}` : `· ${action.text}${mark}`
 }
 
 function decisionLine(decision: Entry, index: number): string {
@@ -72,7 +87,16 @@ function actionBlock(doc: MinutesDoc): string[] {
   return ['■ 할 일', ...doc.actions.map((action) => actionLine(doc, action))]
 }
 
-function speechBlock(doc: MinutesDoc): string[] {
+/** 공유 글에서 사람을 어떻게 부를까. 익명화를 켜면 직분으로, 직분이 없으면 '참석자' 로 */
+function who(doc: MinutesDoc, id: string | null, hide: boolean): string {
+  if (!id) return ''
+  if (!hide) return nameOf(doc.people, id)
+  const person = doc.people[id]
+  if (!person) return ''
+  return person.role.trim() || '참석자'
+}
+
+function speechBlock(doc: MinutesDoc, hide: boolean): string[] {
   const sections = doc.sections
     .map((row) => ({ ...row, entries: row.entries.filter(isShareable) }))
     .filter((row) => row.entries.length > 0)
@@ -82,10 +106,10 @@ function speechBlock(doc: MinutesDoc): string[] {
   sections.forEach((row, index) => {
     lines.push(`${index + 1}) ${sectionTitle(row.agenda)}`)
     for (const entry of row.entries) {
-      const who = nameOf(doc.people, entry.speakerId)
+      const said = who(doc, entry.speakerId, hide)
       if (entry.kind === 'decision') lines.push(`   - 결정: ${entry.text}`)
       else if (entry.kind === 'action') lines.push(`   - 할 일: ${entry.text}`)
-      else if (who) lines.push(`   - ${who}: ${entry.text}`)
+      else if (said) lines.push(`   - ${said}: ${entry.text}`)
       else lines.push(`   - ${entry.text}`)
     }
   })
@@ -108,7 +132,7 @@ export function shareText(doc: MinutesDoc, options: ShareOptions): string {
   head.push(placeLine(doc))
 
   const blocks = [head, decisionBlock(doc), actionBlock(doc)]
-  if (options.includeSpeech) blocks.push(speechBlock(doc))
+  if (options.includeSpeech) blocks.push(speechBlock(doc, options.hideNames === true))
 
   const scribe = doc.meeting.scribe.trim()
   if (scribe) blocks.push([`작성 ${scribe}`])

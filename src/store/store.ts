@@ -2,7 +2,9 @@ import { create } from 'zustand'
 import type { StoreApi, UseBoundStore } from 'zustand'
 import type { GonoteDB } from '../db/db'
 import { clearAll, deleteMeetingDeep, loadAll, persistChanges, persistSettings } from '../db/persist'
+import { parseMention } from '../domain/mention'
 import { nextAgendaOrder, nextOrder } from '../domain/minutes'
+import { templateOf } from '../domain/templates'
 import { isoOf } from '../domain/time'
 import type { Agenda, Attendance, Entry, EntryKind, Meeting, Person, Settings } from '../domain/types'
 import { applyChangeSet, emptyEntityState, isEmptyChangeSet } from './changes'
@@ -35,7 +37,12 @@ export interface AppState {
   updateSettings: (patch: Partial<Settings>) => void
   dismissError: () => void
 
-  createMeeting: (title?: string) => Meeting
+  /**
+   * 회의를 만든다. 틀(`templateId`)을 주면 그 틀의 안건을 미리 깔고,
+   * 참석자(`attendeeIds`)를 주면 전원 참석으로 올린다.
+   * **한 번의 쓰기로 묶는다** — 회의·안건·참석이 따로 저장되면 중간에 끊겼을 때 반쪽 회의가 남는다.
+   */
+  createMeeting: (input?: { title?: string; templateId?: string; attendeeIds?: readonly string[] }) => Meeting
   updateMeeting: (id: string, patch: Partial<Meeting>) => void
   /** 회의와 그 안건·줄·녹음을 통째로 지운다. */
   removeMeeting: (id: string) => void
@@ -51,6 +58,8 @@ export interface AppState {
   updateEntry: (id: string, patch: Partial<Entry>) => void
   removeEntry: (id: string) => void
 
+  /** 틀의 안건을 지금 회의에 깐다. 이미 있는 안건 뒤에 붙는다. */
+  applyTemplate: (meetingId: string, templateId: string) => void
   addAgenda: (meetingId: string, title: string) => Agenda | null
   updateAgenda: (id: string, patch: Partial<Agenda>) => void
   /** 안건만 지운다. **그 안건의 줄은 지우지 않는다** — 적은 것이 사라지면 안 된다. */
@@ -175,10 +184,28 @@ export function createAppStore(db: GonoteDB, now: () => number = Date.now): AppS
         )
       },
 
-      createMeeting: (title) => {
-        const meeting = newMeeting({ id: newId(), now: now(), settings: get().settings, title })
-        commit({ puts: { meetings: [meeting] }, deletes: {} })
-        return meeting
+      createMeeting: (input = {}) => {
+        const template = input.templateId ? templateOf(input.templateId) : undefined
+        const base = newMeeting({ id: newId(), now: now(), settings: get().settings, title: input.title })
+        // 틀이 회의 종류를 들고 있으면 그것을 쓴다. 제목을 사람이 직접 주지 않았을 때만 틀의 종류로 다시 짓는다.
+        const meeting =
+          template && template.kind
+            ? newMeeting({
+                id: base.id,
+                now: now(),
+                settings: { ...get().settings, defaultKind: template.kind },
+                title: input.title,
+              })
+            : base
+
+        const attendees = (input.attendeeIds ?? []).map((personId) => ({ personId, attendance: 'present' as const }))
+        const agendas = (template?.agendas ?? []).map((title, index) =>
+          newAgenda({ id: newId(), meetingId: meeting.id, title, order: index }),
+        )
+
+        const made = { ...meeting, attendees }
+        commit({ puts: { meetings: [made], agendas }, deletes: {} })
+        return made
       },
 
       updateMeeting: (id, patch) => patchRow('meetings', id, patch),
@@ -217,22 +244,42 @@ export function createAppStore(db: GonoteDB, now: () => number = Date.now): AppS
       addEntry: ({ meetingId, kind, text, agendaId, speakerId }) => {
         // 빈 줄은 만들지 않는다. 회의 중에 실수로 두 번 누르는 일이 잦다.
         if (text.trim().length === 0) return null
-        const entry = newEntry({
+
+        // 할 일에서만 `@이름` 을 담당자로 읽는다. 발언에서 읽으면 "@김영수 말대로" 가
+        // 담당 지정으로 오해된다.
+        const mention =
+          kind === 'action' ? parseMention(text, Object.values(get().entities.people)) : null
+
+        const made = newEntry({
           id: newId(),
           now: now(),
           meetingId,
           kind,
-          text,
+          text: mention?.text ?? text,
           order: nextOrder(get().entities.entries, meetingId),
           agendaId: agendaId ?? null,
           speakerId: speakerId ?? null,
         })
+        const entry = mention?.assigneeId ? { ...made, assigneeId: mention.assigneeId } : made
         commit({ puts: { entries: [entry] }, deletes: {} })
         return entry
       },
 
       updateEntry: (id, patch) => patchRow('entries', id, patch),
       removeEntry: (id) => commit({ puts: {}, deletes: { entries: [id] } }),
+
+      applyTemplate: (meetingId, templateId) => {
+        const template = templateOf(templateId)
+        const meeting = get().entities.meetings[meetingId]
+        if (!template || !meeting) return
+        const from = nextAgendaOrder(get().entities.agendas, meetingId)
+        const agendas = template.agendas.map((title, index) =>
+          newAgenda({ id: newId(), meetingId, title, order: from + index }),
+        )
+        // 틀이 회의 종류를 들고 있으면 머리말도 함께 맞춘다. 제목은 사람이 지은 것을 건드리지 않는다.
+        const meetings = template.kind && !meeting.kind ? [{ ...meeting, kind: template.kind }] : []
+        commit({ puts: { agendas, meetings }, deletes: {} })
+      },
 
       addAgenda: (meetingId, title) => {
         if (title.trim().length === 0) return null
