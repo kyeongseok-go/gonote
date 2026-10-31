@@ -24,12 +24,17 @@ async function waitFor(url, tries = 80) {
   throw new Error(`서버가 뜨지 않았어요: ${url}`)
 }
 
-/** 그려진 상자가 44px 미만인 누를 것들. 숨어 있는 것은 뺀다. */
+/**
+ * 그려진 상자가 44px 미만인 누를 것들.
+ *
+ * 숨어 있는 것은 뺀다 — `.set__file` 은 파일 고르기 칸인데, 사람이 직접 누르는 자리가
+ * 아니라(pointer-events: none) 옆의 버튼이 대신 눌러 준다. 접근 가능한 이름은 남겨 뒀다.
+ */
 async function smallTargets(page) {
   return page.evaluate((min) => {
     const nodes = [...document.querySelectorAll('button, a[href], input, textarea, select')]
     return nodes
-      .filter((node) => !node.classList.contains('sr-only'))
+      .filter((node) => !node.classList.contains('sr-only') && !node.classList.contains('set__file'))
       .map((node) => {
         const box = node.getBoundingClientRect()
         return {
