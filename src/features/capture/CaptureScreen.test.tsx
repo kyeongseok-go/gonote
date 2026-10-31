@@ -105,7 +105,7 @@ describe('CaptureScreen', () => {
     const meeting = await withMeeting()
     show(meeting.id)
 
-    await userEvent.click(screen.getByRole('button', { name: '안건', exact: true }))
+    await userEvent.click(screen.getByRole('button', { name: /^안건$/ }))
     await userEvent.type(screen.getByRole('textbox', { name: '새 안건 이름' }), '성탄절 준비{Enter}')
     await write('발언', '현수막부터 정하죠')
 
