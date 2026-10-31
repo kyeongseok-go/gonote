@@ -31,6 +31,8 @@ const SHOTS = [
   { name: '12-회의록-데스크톱', path: 'MEETING/doc', width: 1440, height: 1000, seed: { closed: true } },
   { name: '13-목록-태블릿', path: '', width: 768, height: 1024, seed: {} },
   { name: '14-받아적기-작은폰', path: 'MEETING', width: 320, height: 568, seed: {} },
+  // 실제로 인쇄되는 모습. A4 를 96dpi 로 환산한 크기다(210mm × 297mm).
+  { name: '15-인쇄-A4', path: 'MEETING/doc', width: 794, height: 1123, seed: { closed: true }, print: true },
 ]
 
 async function waitFor(url, tries = 80) {
@@ -82,13 +84,14 @@ try {
     await page.waitForSelector('h1', { timeout: 15_000 })
     // 글꼴이 다 오기 전에 찍으면 줄바꿈이 다르게 나온다
     await page.evaluate(() => document.fonts.ready)
+    if (shot.print) await page.emulateMedia({ media: 'print' })
     if (shot.scroll) await page.evaluate((y) => window.scrollTo(0, y), shot.scroll)
     await page.waitForTimeout(250)
 
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     )
-    await page.screenshot({ path: join(out, `${shot.name}.png`) })
+    await page.screenshot({ path: join(out, `${shot.name}.png`), fullPage: Boolean(shot.print) })
     process.stdout.write(
       `${shot.name}  ${shot.width}×${shot.height}${shot.dark ? ' 다크' : ''}  넘침 ${Math.max(0, overflow)}px\n`,
     )

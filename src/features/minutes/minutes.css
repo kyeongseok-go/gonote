@@ -231,6 +231,16 @@
 }
 
 /* 할 일 — 표로 둔다. 담당과 기한이 눈으로 맞춰져야 한다 */
+.paper__done {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklab, var(--ok) 14%, transparent);
+  color: var(--decision-ink);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+}
+
 .paper__actions {
   width: 100%;
   border-collapse: collapse;
@@ -458,18 +468,15 @@
   .paper__kind,
   .paper__facts dt,
   .paper__people dt,
-  .paper__done {
-  margin-left: 6px;
-  padding: 1px 6px;
-  border-radius: var(--radius-pill);
-  background: color-mix(in oklab, var(--ok) 14%, transparent);
-  color: var(--decision-ink);
-  font-size: var(--text-2xs);
-  font-weight: var(--weight-bold);
-}
-
-.paper__actions th {
+  .paper__actions th {
     color: #444444;
+  }
+
+  /* 완료 표시는 인쇄에서 틴트가 회색 덩어리가 된다. 테두리로 바꾼다. */
+  .paper__done {
+    background: transparent;
+    border: 0.5pt solid #666666;
+    color: #000000;
   }
 
   .paper__facts dd,
