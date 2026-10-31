@@ -1,0 +1,177 @@
+.ppl {
+  display: grid;
+  gap: var(--space-4);
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: calc(var(--safe-t) + var(--space-3)) var(--space-gutter) calc(var(--safe-b) + var(--space-6));
+}
+
+.ppl__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.ppl__top h1 {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+}
+
+.ppl__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  margin-left: calc(var(--space-2) * -1);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+}
+
+.ppl__why,
+.ppl__none {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.ppl__add {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--fill-3);
+}
+
+.ppl__roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.ppl__line {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2);
+}
+
+.ppl__input {
+  min-height: var(--control-h);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+}
+
+.ppl__plus {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-height: var(--control-h);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.ppl__plus:disabled {
+  background: var(--fill-1);
+  color: var(--muted);
+}
+
+.ppl__list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ppl__row {
+  display: grid;
+  grid-template-columns: 1fr 5.5rem auto;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.ppl__name,
+.ppl__role {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+}
+
+.ppl__role {
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+
+.ppl__hide {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  border-radius: var(--radius-sm);
+  background: var(--fill-3);
+  color: var(--muted);
+}
+
+.ppl__hidden {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--fill-3);
+}
+
+.ppl__hidden h2 {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.ppl__hidden p {
+  margin: 2px 0 var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-2xs);
+}
+
+.ppl__hidden ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ppl__hidden li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+
+.ppl__undo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+}

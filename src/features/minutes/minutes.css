@@ -1,0 +1,482 @@
+/* 회의록 문서. **같은 마크업이 화면이 되고 인쇄가 된다.**
+   화면용·인쇄용 레이아웃을 따로 만들면 둘이 어긋나고, 사람은 화면에서 본 것이 인쇄될 거라고 믿는다. */
+
+.min {
+  display: grid;
+  gap: var(--space-4);
+  padding-bottom: calc(var(--safe-b) + var(--space-6));
+}
+
+.min__wait,
+.min__gone {
+  padding: var(--space-6) var(--space-gutter);
+  color: var(--muted);
+}
+
+.min__bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: calc(var(--safe-t) + var(--space-2)) var(--space-gutter) var(--space-2);
+  border-bottom: 1px solid var(--rule);
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  backdrop-filter: var(--blur-bar);
+  -webkit-backdrop-filter: var(--blur-bar);
+}
+
+.min__back,
+.min__barbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.min__bartitle {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  text-align: center;
+}
+
+.min__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0 var(--space-gutter);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.btn--accent {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: var(--weight-bold);
+}
+
+.btn--plain {
+  background: var(--fill-1);
+  color: var(--ink-soft);
+}
+
+.min__said {
+  margin: 0 var(--space-gutter);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--accent-tint);
+  color: var(--accent);
+  font-size: var(--text-xs);
+}
+
+/* ── 종이 ───────────────────────────────────────────── */
+
+.paper {
+  max-width: var(--measure);
+  margin: 0 var(--space-gutter);
+  padding: var(--space-6) var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+  /* 문서는 본문 간격을 넓게 잡는다. 회의록은 소리 내어 읽히지 않고 훑어 읽힌다 */
+  line-height: 1.65;
+}
+
+.paper__head {
+  padding-bottom: var(--space-4);
+  border-bottom: 2px solid var(--ink);
+  text-align: center;
+}
+
+.paper__kind {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+}
+
+.paper__title {
+  margin: 2px 0 var(--space-4);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  /* 큰 제목은 자간을 벌린다(Apple SF Pro 트래킹 규칙) */
+  letter-spacing: 0.008em;
+}
+
+.paper__facts,
+.paper__people {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  text-align: left;
+}
+
+.paper__facts > div,
+.paper__people > div {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr;
+  gap: var(--space-2);
+}
+
+.paper__facts dt,
+.paper__people dt {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+}
+
+.paper__facts dd,
+.paper__people dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--text-sm);
+}
+
+.paper__people {
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--rule);
+}
+
+.paper__block {
+  margin-top: var(--space-5);
+}
+
+.paper__h {
+  margin: 0 0 var(--space-2);
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--rule-strong);
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.01em;
+}
+
+.paper__none {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+/* 결정 — 문서에서 가장 눈에 띄어야 한다 */
+.paper__decisions {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: 1.4em;
+}
+
+.paper__decisions li {
+  color: var(--ink);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+}
+
+.paper__dtext {
+  margin-right: 6px;
+}
+
+.paper__vote {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklab, var(--ok) 14%, transparent);
+  color: var(--decision-ink);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  white-space: nowrap;
+}
+
+.paper__votes {
+  margin-left: 6px;
+  color: var(--muted);
+  font-size: var(--text-2xs);
+}
+
+/* 할 일 — 표로 둔다. 담당과 기한이 눈으로 맞춰져야 한다 */
+.paper__actions {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.paper__actions th,
+.paper__actions td {
+  padding: var(--space-2) var(--space-1);
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+.paper__actions th {
+  color: var(--muted);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+}
+
+.paper__actions td:nth-child(2) {
+  width: 6.5rem;
+}
+
+.paper__actions td:nth-child(3) {
+  width: 6rem;
+  color: var(--ink-soft);
+}
+
+/* 안건별 기록 */
+.paper__agenda {
+  margin-top: var(--space-3);
+}
+
+.paper__ah {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.paper__ano {
+  color: var(--muted);
+}
+
+.paper__lines {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: var(--space-3);
+  list-style: none;
+}
+
+.paper__line {
+  position: relative;
+  padding-left: var(--space-3);
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+
+/* 글머리를 가짜로 그린다. list-style 은 인쇄에서 들여쓰기가 틀어진다 */
+.paper__line::before {
+  position: absolute;
+  left: 0;
+  color: var(--rule-strong);
+  content: '·';
+}
+
+.paper__line--decision,
+.paper__line--action {
+  color: var(--ink);
+  font-weight: var(--weight-medium);
+}
+
+.paper__who {
+  margin-right: 5px;
+  color: var(--ink);
+  font-weight: var(--weight-semibold);
+}
+
+.paper__tag {
+  margin-right: 5px;
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+}
+
+.paper__line--decision .paper__tag {
+  color: var(--decision-ink);
+}
+
+.paper__line--action .paper__tag {
+  color: var(--action-ink);
+}
+
+.paper__line--report .paper__tag {
+  color: var(--report-ink);
+}
+
+.paper__next {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.paper__foot {
+  margin-top: var(--space-6);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+.paper__foot p {
+  margin: 0;
+}
+
+/* 투명도를 쓰지 않는다. --muted 에 opacity 를 얹으면 실효 색이 #929295 가 되어
+   흰 바탕에서 명암비 3.1 로 AA 에 못 미친다(axe 로 실측). 구분은 크기가 한다. */
+.paper__file {
+  margin-top: 2px;
+  font-size: var(--text-2xs);
+}
+
+/* ── 카톡에 붙는 모양 미리보기 ─────────────────────────── */
+
+.min__preview {
+  margin: 0 var(--space-gutter);
+}
+
+.min__ph {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.min__pre {
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--fill-3);
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.min__phint {
+  margin: var(--space-2) 0 0;
+  color: var(--muted);
+  font-size: var(--text-2xs);
+}
+
+@media (min-width: 48rem) {
+  .paper {
+    margin: 0 auto;
+    padding: var(--space-7) var(--space-7);
+  }
+
+  .min__tools,
+  .min__preview,
+  .min__said {
+    max-width: var(--measure);
+    margin-inline: auto;
+    padding-inline: 0;
+  }
+}
+
+/* ── 인쇄 · PDF ─────────────────────────────────────────
+   A4 한 장에 제대로 떨어지게. 화면 장식은 전부 뺀다. */
+@media print {
+  @page {
+    size: A4;
+    margin: 18mm 16mm;
+  }
+
+  /* 화면용 껍데기는 인쇄하지 않는다 */
+  .min__bar,
+  .min__tools,
+  .min__said,
+  .min__preview {
+    display: none !important;
+  }
+
+  .min {
+    display: block;
+    gap: 0;
+    padding: 0;
+  }
+
+  .paper {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    background: #ffffff;
+    box-shadow: none;
+    color: #000000;
+    font-size: 10.5pt;
+    line-height: 1.55;
+  }
+
+  .paper__head {
+    border-bottom: 1.5pt solid #000000;
+  }
+
+  .paper__title {
+    font-size: 17pt;
+  }
+
+  .paper__kind,
+  .paper__facts dt,
+  .paper__people dt,
+  .paper__actions th {
+    color: #444444;
+  }
+
+  .paper__facts dd,
+  .paper__people dd,
+  .paper__line,
+  .paper__decisions li,
+  .paper__actions td {
+    color: #000000;
+  }
+
+  /* 제목과 그 아래 내용이 쪽을 넘어 갈라지지 않게 */
+  .paper__block,
+  .paper__agenda,
+  .paper__decisions li,
+  .paper__actions tr {
+    break-inside: avoid;
+  }
+
+  .paper__h {
+    break-after: avoid;
+    border-bottom: 0.5pt solid #999999;
+    font-size: 11.5pt;
+  }
+
+  .paper__vote {
+    background: transparent;
+    color: #000000;
+    /* 인쇄에서는 틴트가 안 나오거나 회색 덩어리가 된다. 테두리로 바꾼다 */
+    border: 0.5pt solid #666666;
+  }
+
+  .paper__actions th,
+  .paper__actions td {
+    border-bottom: 0.5pt solid #bbbbbb;
+  }
+
+  .paper__line::before {
+    color: #888888;
+  }
+
+  .paper__foot {
+    color: #444444;
+  }
+
+  .paper__file {
+    display: none;
+  }
+}

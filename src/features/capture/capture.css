@@ -1,0 +1,493 @@
+/* 받아적기 화면. 대화창 모양 — 기록이 위로 쌓이고 입력은 아래 고정이다.
+   화면 높이를 100dvh 로 잡는다(100vh 는 폰 주소창 때문에 입력칸이 가려진다). */
+.cap {
+  display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.cap__wait,
+.cap__gone {
+  padding: var(--space-6) var(--space-gutter);
+  color: var(--muted);
+}
+
+.cap__top {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: calc(var(--safe-t) + var(--space-2)) var(--space-gutter) var(--space-2);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.cap__back,
+.cap__doc {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.cap__title h1 {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.016em;
+  /* 제목이 길면 한 줄로 자른다. 두 줄이 되면 기록 영역이 줄어든다. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cap__meta {
+  margin: 1px 0 0;
+  color: var(--muted);
+  font-size: var(--text-2xs);
+}
+
+/* 녹음 기준 맞추기. 폰 음성 메모와 맞물리는 자리다 */
+.cap__rec {
+  padding: var(--space-2) var(--space-gutter);
+  border-bottom: 1px solid var(--rule);
+  background: var(--fill-3);
+}
+
+.cap__recbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--fill-1);
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+}
+
+.cap__recbtn--on {
+  background: var(--accent-tint);
+  color: var(--accent);
+}
+
+.cap__rechint {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: var(--text-2xs);
+  line-height: 1.4;
+}
+
+/* 안건 막대 */
+.agb {
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.agb__scroll {
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-gutter);
+  overflow-x: auto;
+  /* 가로 스크롤 막대를 숨긴다. 폰에서는 안 보이고 데스크톱에서만 두껍게 나온다 */
+  scrollbar-width: none;
+}
+
+.agb__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.agb__item,
+.agb__add {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--fill-3);
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+}
+
+.agb__item--on {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: var(--weight-semibold);
+}
+
+.agb__no {
+  opacity: 0.7;
+  font-size: var(--text-2xs);
+}
+
+.agb__add {
+  color: var(--accent);
+  font-weight: var(--weight-semibold);
+}
+
+.agb__form {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.agb__input {
+  min-width: 9rem;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--text-xs);
+}
+
+/* 적은 기록 */
+.cap__list {
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+  padding: var(--space-3) var(--space-gutter);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.cap__empty {
+  padding: var(--space-5) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--fill-3);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  text-align: center;
+}
+
+.cap__empty-title {
+  margin: 0 0 var(--space-1);
+  color: var(--ink-soft);
+  font-weight: var(--weight-semibold);
+}
+
+.cap__empty p {
+  margin: 0;
+}
+
+/* 한 줄 */
+.row {
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+.row--decision {
+  background: color-mix(in oklab, var(--ok) 8%, var(--surface));
+}
+
+.row--action {
+  background: color-mix(in oklab, var(--warn) 9%, var(--surface));
+}
+
+.row--memo {
+  background: var(--fill-3);
+  box-shadow: none;
+}
+
+.row__main {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+}
+
+.row__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.row__kind {
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.01em;
+}
+
+.row__kind--decision {
+  color: var(--decision-ink);
+}
+
+.row__kind--action {
+  color: var(--action-ink);
+}
+
+.row__kind--report {
+  color: var(--report-ink);
+}
+
+.row__kind--speech,
+.row__kind--memo {
+  color: var(--muted);
+}
+
+.row__who {
+  color: var(--ink-soft);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+}
+
+.row__at {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: var(--text-2xs);
+}
+
+.row__text {
+  color: var(--ink);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  /* 받아쓰기로 들어온 긴 글이 넘치지 않게 */
+  overflow-wrap: break-word;
+}
+
+.row__tail {
+  color: var(--ink-soft);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-medium);
+}
+
+/* 줄 고치기 */
+.row__edit {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0 var(--space-3) var(--space-3);
+  border-top: 1px solid var(--rule);
+  padding-top: var(--space-3);
+}
+
+.row__field {
+  display: grid;
+  gap: 5px;
+}
+
+.row__pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.row__label {
+  color: var(--muted);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-semibold);
+}
+
+.row__box,
+.row__line {
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-sm);
+}
+
+.row__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.chip {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--fill-3);
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+}
+
+.chip--on {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: var(--weight-semibold);
+}
+
+.row__none {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-2xs);
+}
+
+.row__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.row__agenda {
+  color: var(--muted);
+  font-size: var(--text-2xs);
+}
+
+.row__del {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-2);
+  margin-left: auto;
+  border-radius: var(--radius-sm);
+  color: var(--danger);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+}
+
+/* 입력 독 */
+.cap__dock {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-gutter) calc(var(--safe-b) + var(--space-2));
+  border-top: 1px solid var(--rule);
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+}
+
+.spk {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.spk::-webkit-scrollbar {
+  display: none;
+}
+
+.spk__item {
+  flex: 0 0 auto;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--fill-3);
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+}
+
+.spk__item--on {
+  background: var(--accent-tint);
+  color: var(--accent);
+  font-weight: var(--weight-semibold);
+}
+
+.cap__kinds {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--fill-2);
+}
+
+.cap__kind {
+  min-height: calc(var(--tap-min) - 8px);
+  border-radius: var(--radius-pill);
+  color: var(--ink-soft);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  transition:
+    background var(--duration-instant) var(--ease-ui),
+    color var(--duration-instant) var(--ease-ui);
+}
+
+.cap__kind--on {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-1);
+}
+
+.cap__kind--decision.cap__kind--on {
+  color: var(--decision-ink);
+}
+
+.cap__kind--action.cap__kind--on {
+  color: var(--action-ink);
+}
+
+.cap__kind--report.cap__kind--on {
+  color: var(--report-ink);
+}
+
+.cap__input {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2);
+  align-items: end;
+}
+
+.cap__box {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  /* 폰에서 16px 밑으로 내려가면 사파리가 화면을 확대한다 */
+  font-size: 16px;
+  line-height: 1.45;
+  resize: none;
+}
+
+.cap__send {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-width: var(--tap-min);
+  min-height: var(--control-h);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.cap__send:disabled {
+  background: var(--fill-1);
+  color: var(--muted);
+}
+
+.cap__tip {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-2xs);
+  text-align: center;
+}
+
+/* 넓은 화면에서는 가운데로 모은다. 회의록은 데스크톱에서도 쓴다 */
+@media (min-width: 48rem) {
+  .cap {
+    max-width: 44rem;
+    margin: 0 auto;
+    border-inline: 1px solid var(--rule);
+  }
+}
