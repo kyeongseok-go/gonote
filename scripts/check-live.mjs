@@ -34,7 +34,7 @@ try {
   }
 
   // 안건 하나 만들고 그 아래로 적는다
-  await page.getByRole('button', { name: '안건' }).click()
+  await page.getByRole('button', { name: /^안건$/ }).click()
   await page.getByRole('textbox', { name: '새 안건 이름' }).fill('성탄절 준비')
   await page.getByRole('textbox', { name: '새 안건 이름' }).press('Enter')
 

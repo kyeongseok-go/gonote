@@ -7,6 +7,7 @@ import { CaptureScreen } from '../features/capture/CaptureScreen'
 import { MinutesScreen } from '../features/minutes/MinutesScreen'
 import { PeopleScreen } from '../features/people/PeopleScreen'
 import { SettingsScreen } from '../features/settings/SettingsScreen'
+import { HelpScreen } from '../features/help/HelpScreen'
 import './app.css'
 
 export function App() {
@@ -64,6 +65,7 @@ function Shell() {
         <Route path="/m/:id/doc" element={<MinutesScreen />} />
         <Route path="/people" element={<PeopleScreen />} />
         <Route path="/settings" element={<SettingsScreen />} />
+        <Route path="/help" element={<HelpScreen />} />
         <Route path="*" element={<MeetingList />} />
       </Routes>
     </>

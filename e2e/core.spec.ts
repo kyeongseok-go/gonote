@@ -168,3 +168,21 @@ for (const theme of ['light', 'dark'] as const) {
     expect(doc.violations).toEqual([])
   })
 }
+
+test('사용법을 앱 안에서 볼 수 있다 — 회의 직전에 처음 여는 사람을 위해', async ({ page }) => {
+  await page.goto('/')
+
+  await page.getByRole('link', { name: '사용법' }).click()
+
+  await expect(page.getByRole('heading', { name: '사용법' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '적는 법' })).toBeVisible()
+  await expect(page.getByText(/폰 음성 메모로 녹음을 켠다/)).toBeVisible()
+})
+
+test('접근성 — 사용법 화면', async ({ page }) => {
+  await page.goto('/#/help')
+  await expect(page.getByRole('heading', { name: '사용법' })).toBeVisible()
+
+  const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()
+  expect(result.violations).toEqual([])
+})

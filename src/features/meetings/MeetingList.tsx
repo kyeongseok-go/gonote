@@ -3,7 +3,7 @@
 // 회의는 늘 급하게 시작된다. 제목·장소·참석자를 먼저 묻는 화면을 두면 그걸 채우는 동안
 // 회의가 시작되고, 앞부분을 놓친다. 그래서 바로 만들고 **나중에 고치게** 한다.
 import { Link, useNavigate } from 'react-router-dom'
-import { ChevronRight, Plus, Settings, Users } from 'lucide-react'
+import { ChevronRight, CircleHelp, Plus, Settings, Users } from 'lucide-react'
 import { useApp } from '../../store/app'
 import { buildMinutes } from '../../domain/minutes'
 import { koreanDayShort } from '../../domain/time'
@@ -32,6 +32,9 @@ export function MeetingList() {
           <p className="mts__sub">적으면 그대로 회의록이 돼요</p>
         </div>
         <nav className="mts__nav">
+          <Link to="/help" className="mts__icon" aria-label="사용법">
+            <CircleHelp size={20} aria-hidden="true" />
+          </Link>
           <Link to="/people" className="mts__icon" aria-label="명부">
             <Users size={20} aria-hidden="true" />
           </Link>
@@ -55,6 +58,9 @@ export function MeetingList() {
             위 <strong>회의 시작</strong>을 누르면 바로 적을 수 있어요. 이름·장소·참석자는 회의 중에 고쳐도
             돼요.
           </p>
+          <Link to="/help" className="mts__helplink">
+            처음이면 사용법 먼저 보기 (30초)
+          </Link>
         </section>
       ) : (
         <ul className="mts__list">

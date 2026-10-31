@@ -1,0 +1,127 @@
+.hlp {
+  display: grid;
+  gap: var(--space-5);
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: calc(var(--safe-t) + var(--space-3)) var(--space-gutter) calc(var(--safe-b) + var(--space-6));
+}
+
+.hlp__top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.hlp__top h1 {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+}
+
+.hlp__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  margin-left: calc(var(--space-2) * -1);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+}
+
+.hlp__block {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.hlp__block h2 {
+  margin: 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--rule);
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+}
+
+.hlp__block--note {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--fill-3);
+}
+
+.hlp__block--note h2 {
+  border-bottom: 0;
+  padding-bottom: 0;
+  font-size: var(--text-sm);
+}
+
+.hlp__lead {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  line-height: 1.65;
+}
+
+/* 번호 있는 순서. base.css 가 목록 표식을 지우므로 여기서 되살린다 */
+.hlp__steps {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: 1.4em;
+  list-style: decimal;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.hlp__steps li::marker {
+  color: var(--accent);
+  font-weight: var(--weight-bold);
+}
+
+.hlp__tips {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 1.1em;
+  list-style: disc;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.hlp__tips li::marker {
+  color: var(--rule-strong);
+}
+
+.hlp__kinds {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.hlp__kinds > div {
+  display: grid;
+  grid-template-columns: 3.4rem minmax(0, 1fr);
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+.hlp__kinds dt {
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.hlp__kinds dd {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+}
+
+.hlp code {
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
+  background: var(--fill-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}

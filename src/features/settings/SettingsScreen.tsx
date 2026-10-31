@@ -114,6 +114,13 @@ export function SettingsScreen() {
         </Link>
       </section>
 
+      <section className="set__block">
+        <h2 className="set__h">사용법</h2>
+        <Link to="/help" className="set__link">
+          어떻게 쓰는지 보기
+        </Link>
+      </section>
+
       <section className="set__block set__block--danger">
         <h2 className="set__h">모두 지우기</h2>
         <p className="set__hint">
