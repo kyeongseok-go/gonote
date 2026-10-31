@@ -60,6 +60,9 @@ try {
 
   const share = (await page.locator('.min__pre').textContent()) ?? ''
   say(`카톡 글: ${share.split('\n').length}줄, 결정 번호 ${share.includes('1. ') ? '붙음' : '없음'}`)
+  say('--- 카톡에 붙는 글 ---')
+  for (const line of share.split('\n')) say(`| ${line}`)
+  say('---------------------')
 
   // 중단 복원: 앱을 완전히 닫았다 여는 것과 같다(설치한 PWA 의 start_url 은 './')
   await page.goto(BASE, { waitUntil: 'networkidle' })
