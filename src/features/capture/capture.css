@@ -7,6 +7,13 @@
   overflow: hidden;
 }
 
+/* 격자 칸의 기본 min-width 는 auto 다 — 안쪽이 넓으면 칸이 화면 밖으로 밀려 나가고,
+   .cap 이 overflow: hidden 이라 **잘린 채 조용히 사라진다**(종류 5칸 중 2칸과 넣기 버튼이
+   그렇게 없어졌다). 줄어들 수 있게 0 으로 눌러 둔다. */
+.cap > * {
+  min-width: 0;
+}
+
 .cap__wait,
 .cap__gone {
   padding: var(--space-6) var(--space-gutter);
@@ -15,7 +22,7 @@
 
 .cap__top {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-2);
   padding: calc(var(--safe-t) + var(--space-2)) var(--space-gutter) var(--space-2);
@@ -399,6 +406,7 @@
 }
 
 .cap__kinds {
+  min-width: 0;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 4px;
@@ -407,8 +415,12 @@
   background: var(--fill-2);
 }
 
+/* 이 앱에서 가장 많이 누르는 컨트롤이다. 44px 를 깎지 않는다 —
+   세그먼트 트랙의 안쪽 여백은 버튼 높이에 더해지는 것이지 대신하는 것이 아니다(실측 36px). */
 .cap__kind {
-  min-height: calc(var(--tap-min) - 8px);
+  min-width: 0;
+  min-height: var(--tap-min);
+  white-space: nowrap;
   border-radius: var(--radius-pill);
   color: var(--ink-soft);
   font-size: var(--text-xs);
@@ -438,13 +450,14 @@
 
 .cap__input {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--space-2);
   align-items: end;
 }
 
 .cap__box {
   width: 100%;
+  min-width: 0;
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--rule);
   border-radius: var(--radius-lg);

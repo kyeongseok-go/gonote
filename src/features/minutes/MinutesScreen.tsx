@@ -10,7 +10,7 @@ import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ChevronLeft, Copy, Printer, Share2 } from 'lucide-react'
 import { useApp } from '../../store/app'
-import { buildMinutes, nameOf, sectionTitle } from '../../domain/minutes'
+import { buildMinutes, nameOf, sectionTitle, timeLabel } from '../../domain/minutes'
 import { fileNameOf, isShareable, shareText, summaryText } from '../../domain/share'
 import { clockOf, koreanDay } from '../../domain/time'
 import { ATTENDANCE_LABELS, ENTRY_LABELS, VOTE_LABELS } from '../../domain/types'
@@ -131,8 +131,7 @@ export function MinutesScreen() {
               <dt>일시</dt>
               <dd>
                 {koreanDay(meeting.date)}
-                {meeting.openedAt ? ` ${clockOf(meeting.openedAt)}` : ''}
-                {meeting.closedAt ? `~${clockOf(meeting.closedAt)}` : ''}
+                {timeLabel(meeting) ? ` ${timeLabel(meeting)}` : ''}
                 {doc.durationMinutes !== null ? ` (${doc.durationMinutes}분)` : ''}
               </dd>
             </div>
@@ -192,8 +191,12 @@ export function MinutesScreen() {
               {doc.decisions.map((row) => (
                 <li key={row.id}>
                   <span className="paper__dtext">{row.text}</span>
-                  {row.result ? <span className="paper__vote">{VOTE_LABELS[row.result]}</span> : null}
-                  <Votes entry={row} />
+                  {row.result || hasVotes(row) ? (
+                    <span className="paper__meta">
+                      {row.result ? <span className="paper__vote">{VOTE_LABELS[row.result]}</span> : null}
+                      <Votes entry={row} />
+                    </span>
+                  ) : null}
                 </li>
               ))}
             </ol>
@@ -294,6 +297,11 @@ export function MinutesScreen() {
       </section>
     </main>
   )
+}
+
+/** 표결 수를 하나라도 셌나. 안 센 것과 0 은 다르다. */
+function hasVotes(entry: Entry): boolean {
+  return entry.vote.for !== null || entry.vote.against !== null || entry.vote.abstain !== null
 }
 
 /** 찬성·반대·기권 수. 센 것만 보여 준다 — 안 센 것과 0 은 다르다. */

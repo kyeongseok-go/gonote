@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { buildMinutes, nextOrder, personLabel, sectionTitle } from './minutes'
+import { buildMinutes, nextOrder, personLabel, sectionTitle, timeLabel } from './minutes'
 import { makeAgenda, makeEntry, makeMeeting, makePerson } from '../test/factories'
 import type { Agenda, Entry, Person } from './types'
 
@@ -219,5 +219,26 @@ describe('nextOrder', () => {
     const entries = byId([makeEntry({ id: 'eX', meetingId: '다른회의', order: 99 })])
 
     expect(nextOrder(entries, 'm1')).toBe(0)
+  })
+})
+
+describe('timeLabel', () => {
+  const open = new Date(2026, 10, 1, 10, 0).toISOString()
+  const close = new Date(2026, 10, 1, 11, 20).toISOString()
+
+  test('개회와 폐회가 다 있으면 범위로 적는다', () => {
+    expect(timeLabel(makeMeeting({ openedAt: open, closedAt: close }))).toBe('10:00~11:20')
+  })
+
+  test('개회만 있으면 개회라고 적는다', () => {
+    expect(timeLabel(makeMeeting({ openedAt: open }))).toBe('10:00 개회')
+  })
+
+  test('폐회만 있으면 폐회라고 적는다 — "~01:40" 처럼 적으면 고장처럼 보인다', () => {
+    expect(timeLabel(makeMeeting({ closedAt: close }))).toBe('11:20 폐회')
+  })
+
+  test('둘 다 없으면 빈 문자열', () => {
+    expect(timeLabel(makeMeeting())).toBe('')
   })
 })

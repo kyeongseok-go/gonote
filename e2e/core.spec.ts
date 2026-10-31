@@ -87,7 +87,7 @@ test('카톡에 붙는 글이 미리 보인다', async ({ page }) => {
 
 test('안건을 만들면 그 뒤 줄이 그 안건에 붙는다', async ({ page }) => {
   await startMeeting(page)
-  await page.getByRole('button', { name: '안건' }).click()
+  await page.getByRole('button', { name: '안건', exact: true }).click()
   await page.getByRole('textbox', { name: '새 안건 이름' }).fill('성탄절 준비')
   await page.getByRole('textbox', { name: '새 안건 이름' }).press('Enter')
   await write(page, '발언', '현수막부터 정하죠')

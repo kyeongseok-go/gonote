@@ -4,7 +4,7 @@
 // 두 문서에서 다르게 보이는 것이 이 앱에서 가장 나쁜 고장이다.
 //
 // 전부 순수 함수다. 오늘·지금을 부르지 않는다.
-import { minutesBetween } from './time'
+import { clockOf, minutesBetween } from './time'
 import type { Agenda, Entry, Meeting, Person } from './types'
 
 /** 안건 밖 줄을 담는 묶음의 이름. 화면과 내보내기가 같은 말을 쓴다. */
@@ -150,4 +150,19 @@ export function nextAgendaOrder(agendas: Readonly<Record<string, Agenda>>, meeti
   const mine = Object.values(agendas).filter((row) => row.meetingId === meetingId)
   if (mine.length === 0) return 0
   return Math.max(...mine.map((row) => row.order)) + 1
+}
+
+/**
+ * 회의록 머리와 공유 글이 함께 쓰는 시각 표시.
+ *
+ * 한쪽만 있을 때 '~01:40' 처럼 적으면 고장처럼 보인다(스크린샷에서 발견).
+ * 무엇이 비었는지를 말로 적어 준다.
+ */
+export function timeLabel(meeting: Meeting): string {
+  const open = meeting.openedAt ? clockOf(meeting.openedAt) : ''
+  const close = meeting.closedAt ? clockOf(meeting.closedAt) : ''
+  if (open && close) return `${open}~${close}`
+  if (open) return `${open} 개회`
+  if (close) return `${close} 폐회`
+  return ''
 }

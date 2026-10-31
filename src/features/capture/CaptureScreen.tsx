@@ -66,8 +66,12 @@ export function CaptureScreen() {
   const currentAgendaId = picked ?? agendas.at(-1)?.id ?? null
 
   // 줄이 늘면 맨 아래로 내린다. 적은 줄이 화면 밖에 있으면 적힌 줄 알 수 없다.
+  //
+  // scrollIntoView 가 없는 환경이 있다(구형 웹뷰, 테스트 환경). 그냥 부르면 그 자리에서 터져
+  // **회의 중에 화면이 통째로 날아간다.** 있을 때만 부른다.
   useEffect(() => {
-    tail.current?.scrollIntoView({ block: 'end' })
+    const end = tail.current
+    if (typeof end?.scrollIntoView === 'function') end.scrollIntoView({ block: 'end' })
   }, [entries.length])
 
   if (!ready) return <p className="cap__wait">읽는 중이에요…</p>

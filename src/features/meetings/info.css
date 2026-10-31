@@ -79,7 +79,7 @@
 
 .inf__pair {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--space-2);
 }
 
@@ -107,15 +107,19 @@
   list-style: none;
 }
 
+/* 이름이 길면 칸이 밀려 2px 넘쳤다(스크린샷 실측). 줄어들 수 있게 눌러 둔다. */
 .inf__person {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--space-2);
   align-items: center;
   min-height: var(--tap-min);
 }
 
 .inf__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--ink);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
@@ -129,9 +133,10 @@
   background: var(--fill-2);
 }
 
+/* 참석 체크는 회의 전에 10번 넘게 누른다. 44px 를 지킨다(실측 36px 였다). */
 .inf__state {
   min-width: 2.9rem;
-  min-height: calc(var(--tap-min) - 8px);
+  min-height: var(--tap-min);
   border-radius: var(--radius-pill);
   color: var(--muted);
   font-size: var(--text-xs);

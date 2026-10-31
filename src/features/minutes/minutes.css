@@ -178,11 +178,19 @@
 }
 
 /* 결정 — 문서에서 가장 눈에 띄어야 한다 */
+/* base.css 가 모든 목록의 표식을 지운다. 결정은 **번호가 있어야** 카톡에서
+   "2번 말씀인데요" 로 가리킬 수 있다. 여기서만 되살린다. */
 .paper__decisions {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-3);
   margin: 0;
-  padding-left: 1.4em;
+  padding-left: 1.5em;
+  list-style: decimal;
+}
+
+.paper__decisions li::marker {
+  color: var(--muted);
+  font-weight: var(--weight-bold);
 }
 
 .paper__decisions li {
@@ -191,8 +199,18 @@
   font-weight: var(--weight-medium);
 }
 
+/* 표결 표시는 아랫줄로 내린다. 같은 줄에 끼면 결정 문장이 '…가결하 / 다 [뱃지]' 로
+   끊겨 읽힌다(스크린샷에서 확인). */
 .paper__dtext {
-  margin-right: 6px;
+  display: block;
+}
+
+.paper__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
 }
 
 .paper__vote {

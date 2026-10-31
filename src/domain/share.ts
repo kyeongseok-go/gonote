@@ -8,9 +8,9 @@
 //  - 이모지를 쓰지 않는다. 교회 공식 기록이고, 기기마다 다르게 보인다
 //  - 구조는 들여쓰기와 소수의 기호(■ · -)로만 만든다
 //  - 결정에는 번호를 붙인다. 카톡에서 "2번 말씀인데요" 로 가리킬 수 있어야 한다
-import { nameOf, sectionTitle } from './minutes'
+import { nameOf, sectionTitle, timeLabel } from './minutes'
 import type { MinutesDoc } from './minutes'
-import { clockOf, koreanDay } from './time'
+import { koreanDay } from './time'
 import { VOTE_LABELS } from './types'
 import type { Entry, Meeting } from './types'
 
@@ -46,13 +46,6 @@ function shortDue(due: string): string {
   const match = /^\d{4}-(\d{2})-(\d{2})$/.exec(due)
   if (!match) return due
   return `${Number(match[1])}월 ${Number(match[2])}일`
-}
-
-function timeRange(meeting: Meeting): string {
-  const open = meeting.openedAt ? clockOf(meeting.openedAt) : ''
-  const close = meeting.closedAt ? clockOf(meeting.closedAt) : ''
-  if (open && close) return `${open}~${close}`
-  return open || close
 }
 
 /** '본당 2층 회의실 · 참석 9/10' — 빈 조각은 넣지 않는다. */
@@ -127,7 +120,7 @@ function joinBlocks(blocks: string[][]): string {
 /** 카톡에 붙이는 전체 회의록. */
 export function shareText(doc: MinutesDoc, options: ShareOptions): string {
   const head = [`[${doc.meeting.title.trim() || '회의록'}]`, koreanDay(doc.meeting.date)]
-  const range = timeRange(doc.meeting)
+  const range = timeLabel(doc.meeting)
   if (range) head[1] = `${head[1]} ${range}`
   head.push(placeLine(doc))
 
