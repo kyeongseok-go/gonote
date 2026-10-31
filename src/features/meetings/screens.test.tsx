@@ -266,3 +266,86 @@ describe('SettingsScreen', () => {
     await waitFor(() => expect(Object.keys(useApp.getState().entities.meetings)).toHaveLength(0))
   })
 })
+
+describe('백업', () => {
+  function showSettings() {
+    return render(
+      <MemoryRouter>
+        <SettingsScreen />
+      </MemoryRouter>,
+    )
+  }
+
+  test('내보내면 파일 이름을 알려 준다', async () => {
+    const click = vi.fn()
+    vi.spyOn(document, 'createElement').mockImplementation(((tag: string) => {
+      const node = Object.assign(document.createElementNS('http://www.w3.org/1999/xhtml', tag), { click })
+      return node
+    }) as never)
+    Object.assign(URL, { createObjectURL: vi.fn(() => 'blob:x'), revokeObjectURL: vi.fn() })
+    useApp.getState().createMeeting({ title: '11월 제직회' })
+    await useApp.getState().settled()
+    showSettings()
+
+    await userEvent.click(screen.getByRole('button', { name: /파일로 내보내기/ }))
+
+    expect(click).toHaveBeenCalled()
+    expect(screen.getByRole('status')).toHaveTextContent('gonote-백업-')
+    vi.restoreAllMocks()
+  })
+
+  test('가져오면 회의가 들어온다', async () => {
+    showSettings()
+    const backup = {
+      app: 'gonote',
+      version: 1,
+      exportedAt: '2026-11-01T02:00:00.000Z',
+      meetings: {
+        mX: {
+          id: 'mX',
+          title: '가져온 회의',
+          kind: '제직회',
+          date: '2026-10-04',
+          place: '',
+          scribe: '',
+          attendees: [],
+          openedAt: null,
+          closedAt: null,
+          recordingStartedAt: null,
+          nextMeetingNote: '',
+          createdAt: '2026-10-04T01:00:00.000Z',
+        },
+      },
+      people: {},
+      agendas: {},
+      entries: {},
+    }
+    const file = new File([JSON.stringify(backup)], 'backup.json', { type: 'application/json' })
+
+    await userEvent.upload(screen.getByLabelText('백업 파일 고르기'), file)
+
+    await waitFor(() => expect(useApp.getState().entities.meetings.mX?.title).toBe('가져온 회의'))
+    expect(screen.getByRole('status')).toHaveTextContent('가져왔어요')
+  })
+
+  test('남의 앱 백업은 거절하고 지금 회의록을 건드리지 않는다', async () => {
+    const mine = useApp.getState().createMeeting({ title: '내 회의' })
+    await useApp.getState().settled()
+    showSettings()
+    const file = new File([JSON.stringify({ app: 'godo', version: 1 })], 'x.json', { type: 'application/json' })
+
+    await userEvent.upload(screen.getByLabelText('백업 파일 고르기'), file)
+
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('gonote 백업 파일이 아니에요'))
+    expect(useApp.getState().entities.meetings[mine.id]).toBeDefined()
+  })
+
+  test('JSON 이 아니면 읽지 못했다고 알린다', async () => {
+    showSettings()
+    const file = new File(['그냥 글'], 'x.json', { type: 'application/json' })
+
+    await userEvent.upload(screen.getByLabelText('백업 파일 고르기'), file)
+
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('파일을 읽지 못했어요'))
+  })
+})

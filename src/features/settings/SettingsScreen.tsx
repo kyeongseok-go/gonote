@@ -1,7 +1,9 @@
 // 설정. **새 회의에 미리 채워 둘 값**이 여기 있다 — 교회 회의는 종류·장소·서기가 매번 같다.
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, Download, Upload } from 'lucide-react'
 import { useApp } from '../../store/app'
+import { backupFileName, buildBackup, readBackup } from './backup'
 import './settings.css'
 
 const THEMES = [
@@ -12,8 +14,44 @@ const THEMES = [
 
 export function SettingsScreen() {
   const settings = useApp((s) => s.settings)
+  const entities = useApp((s) => s.entities)
   const updateSettings = useApp((s) => s.updateSettings)
   const clearEverything = useApp((s) => s.clearEverything)
+  const importBackup = useApp((s) => s.importBackup)
+  const picker = useRef<HTMLInputElement>(null)
+  const [notice, setNotice] = useState<string | null>(null)
+
+  /** 파일로 내려받는다. 아이폰 사파리에서는 '파일' 앱에 저장된다. */
+  const exportFile = () => {
+    const at = new Date().toISOString()
+    const text = JSON.stringify(buildBackup(entities, settings, at), null, 2)
+    const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }))
+    const link = document.createElement('a')
+    link.href = url
+    link.download = backupFileName(at)
+    link.click()
+    // 바로 놓아주면 저장이 시작되기 전에 주소가 사라지는 기기가 있다.
+    setTimeout(() => URL.revokeObjectURL(url), 10_000)
+    setNotice(`내보냈어요: ${backupFileName(at)}`)
+  }
+
+  const importFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    // 같은 파일을 두 번 고를 수 있게 비워 둔다.
+    event.target.value = ''
+    if (!file) return
+    try {
+      const read = readBackup(JSON.parse(await file.text()))
+      if (!read.backup) {
+        setNotice(read.message)
+        return
+      }
+      importBackup(read.backup)
+      setNotice(`가져왔어요. ${read.message}`)
+    } catch {
+      setNotice('파일을 읽지 못했어요. JSON 파일이 맞는지 봐 주세요.')
+    }
+  }
 
   return (
     <main className="set">
@@ -119,6 +157,38 @@ export function SettingsScreen() {
         <Link to="/help" className="set__link">
           어떻게 쓰는지 보기
         </Link>
+      </section>
+
+      <section className="set__block">
+        <h2 className="set__h">백업</h2>
+        <p className="set__hint">
+          회의록은 <strong>이 폰 안에만</strong> 있어요. 폰을 바꾸거나 사파리 자료를 지우면 사라져요.
+          가끔 내보내서 파일로 두면 안전해요.
+        </p>
+        <div className="set__row">
+          <button type="button" className="set__link" onClick={exportFile}>
+            <Download size={16} aria-hidden="true" />
+            파일로 내보내기
+          </button>
+          <button type="button" className="set__link" onClick={() => picker.current?.click()}>
+            <Upload size={16} aria-hidden="true" />
+            파일에서 가져오기
+          </button>
+          <input
+            ref={picker}
+            type="file"
+            accept="application/json,.json"
+            className="set__file"
+            aria-label="백업 파일 고르기"
+            tabIndex={-1}
+            onChange={importFile}
+          />
+        </div>
+        {notice ? (
+          <p className="set__notice" role="status">
+            {notice}
+          </p>
+        ) : null}
       </section>
 
       <section className="set__block set__block--danger">

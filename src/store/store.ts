@@ -73,6 +73,15 @@ export interface AppState {
   setAttendance: (meetingId: string, personId: string, attendance: Attendance) => void
   removeAttendee: (meetingId: string, personId: string) => void
 
+  /** 백업을 들여온다. **지금 있는 것 위에 얹는다** — 같은 id 는 덮어쓰고 나머지는 남는다. */
+  importBackup: (data: {
+    meetings: Record<string, Meeting>
+    people: Record<string, Person>
+    agendas: Record<string, Agenda>
+    entries: Record<string, Entry>
+    settings?: Settings
+  }) => void
+
   /** 모두 지우기. 되돌릴 수 없다. */
   clearEverything: () => Promise<void>
 }
@@ -324,6 +333,27 @@ export function createAppStore(db: GonoteDB, now: () => number = Date.now): AppS
         const meeting = get().entities.meetings[meetingId]
         if (!meeting) return
         commit({ puts: { meetings: [withoutAttendee(meeting, personId)] }, deletes: {} })
+      },
+
+      importBackup: (data) => {
+        // 지우지 않고 얹는다. 가져오기가 지금 회의록을 날리면 되돌릴 방법이 없다.
+        commit({
+          puts: {
+            meetings: Object.values(data.meetings),
+            people: Object.values(data.people),
+            agendas: Object.values(data.agendas),
+            entries: Object.values(data.entries),
+          },
+          deletes: {},
+        })
+        if (data.settings) {
+          const settings = { ...data.settings, id: 'settings' as const }
+          set({ settings })
+          track(
+            () => persistSettings(db, settings),
+            (error) => `설정을 저장하지 못했어요. (${describeError(error)})`,
+          )
+        }
       },
 
       clearEverything: async () => {
